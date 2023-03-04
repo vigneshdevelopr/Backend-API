@@ -1,73 +1,62 @@
-const dotenv = require("dotenv")
-dotenv.config()
+import express from "express";
+// import path from "path"
+import Obj from "mongodb";
 
+import dotenv from "dotenv";
 
+import { StudData } from "./routes/students.js";
 
-const express = require("express");
+dotenv.config();
+
 const app = express();
-const PORT = 9000;
+export var ObjectId = Obj.ObjectId;
 
+const PORT = process.env.demosite;
 
-
-
-const path = require("path");
-const fs = require("fs");
-const { MongoClient } = require("mongodb");
-const ObjectId = require("mongodb").ObjectId;
+// const path = require("path");
+// const fs = require("fs");
+// const { MongoClient } = require("mongodb");
+// const ObjectId = require("mongodb").ObjectId;
 //changing directory
-const currentfile = path.join(__dirname, "databreach");
-console.log(currentfile);
+// const currentfile = path.join(__dirname, "databreach");
+// console.log(currentfile);
 
-//writing
-const writetext = "hello world";
-fs.writeFile(`${currentfile}/databreach.txt`, writetext, (err) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log("successfully written databreach❤️");
-  }
-});
-
+// //writing
+// const writetext = "hello world";
+// fs.writeFile(`${currentfile}/databreach.txt`, writetext, (err) => {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     console.log("successfully written databreach❤️");
+//   }
+// });
 
 //picking particular file from the whole dataset
 //syntax:
 //app.use(express.static())
 
+
+
 app.use(express.static("databreach"));
 app.use(express.json());
-
-//==================connectivity to mongodb==========================================================
-
-//Mongo Db Connection
-
-// const MONGO_URL = "mongodb://127.0.0.1:27017/Mockdata";
-const MONGO_URL = process.env.Mongo_URL;
-
-async function createConnection() {
-  const client = new MongoClient(MONGO_URL);
-  await client.connect();
-  console.log("Mongodb is succesfuly connected");
-  return client;
-}
-
-const client = createConnection();
+app.use("/all/students", StudData);
 
 //============================================================================
 
-app.get("/all/students", async (req, res) => {
-  console.log(req.query);
-  const studentsData = await (await client)
-    .db("Mockdata")
-    .collection("students")
-    .find(req.query)
-    .toArray(); // to return all data from an array
-  res.status(200).json(studentsData);
-});
+// app.get("/all/students", async (req, res) => {
+//   console.log(req.query);
+//   const studentsData = await (await client)
+//     .db("Mockdata")
+//     .collection("students")
+//     .find(req.query)
+//     .toArray(); // to return all data from an array
+//   res.status(200).json(studentsData);
+// });
 
 //==============
-app.get("/static", (req, res) => {
-  res.sendFile(path.join(__dirname, "databreach/databreach.txt"));
-});
+// app.get("/static", (req, res) => {
+//   res.sendFile(path.join(__dirname, "databreach/databreach.txt"));
+// });
 //================================================================
 
 //get by parameters
@@ -83,19 +72,19 @@ app.get("/data/:id", (req, res) => {
 
 //get by params from database
 
-app.get("/all/students/:id", async (req, res) => {
-  const { id } = req.params;
-  console.log(req.params);
-  console.log(id);
-  const students = await (
-    await client
-  )
-    .db("Mockdata")
-    .collection("students")
-    .findOne({ _id: new ObjectId(id) });
-  console.log(students);
-  res.status(200).json(students);
-});
+// app.get("/all/students/:id", async (req, res) => {
+//   const { id } = req.params;
+//   console.log(req.params);
+//   console.log(id);
+//   const students = await (
+//     await client
+//   )
+//     .db("Mockdata")
+//     .collection("students")
+//     .findOne({ _id: new ObjectId(id) });
+//   console.log(students);
+//   res.status(200).json(students);
+// });
 
 //================================================================
 
@@ -140,16 +129,16 @@ app.post("/data", (req, res) => {
   res.send(data);
 });
 
-app.post("/all/students", async (req, res) => {
-  const newdata = req.body;
+// app.post("/all/students", async (req, res) => {
+//   const newdata = req.body;
 
-  const addData = await (await client)
-    .db("Mockdata")
-    .collection("students")
-    .insertMany(newdata);
+//   const addData = await (await client)
+//     .db("Mockdata")
+//     .collection("students")
+//     .insertMany(newdata);
 
-  res.status(201).json(addData);
-});
+//   res.status(201).json(addData);
+// });
 
 //================================================================
 
@@ -170,22 +159,22 @@ app.put("/data/:id", (req, res) => {
   res.send(data);
 });
 
-//edit from database
+// //edit from database
 
-app.put("/all/students/:id", async (req, res) => {
-  const { id } = req.params;
-  const updateStud = req.body;
-  console.log(req.params);
-  console.log(id);
-  const students = await (
-    await client
-  )
-    .db("Mockdata")
-    .collection("students")
-    .updateMany({ _id: new ObjectId(id) }, { $set: updateStud });
-  console.log(students);
-  res.status(200).json(students);
-});
+// app.put("/all/students/:id", async (req, res) => {
+//   const { id } = req.params;
+//   const updateStud = req.body;
+//   console.log(req.params);
+//   console.log(id);
+//   const students = await (
+//     await client
+//   )
+//     .db("Mockdata")
+//     .collection("students")
+//     .updateMany({ _id: new ObjectId(id) }, { $set: updateStud });
+//   console.log(students);
+//   res.status(200).json(students);
+// });
 
 //================================================================
 
@@ -198,23 +187,19 @@ app.delete("/data/:id", (req, res) => {
   res.send(DeleteData);
 });
 
+// //delete from the database
 
+// app.delete('/all/students/:id', async(req, res) => {
+//   const { id } = req.params;
+//   const deleteStud = await (
+//     await client
+//   )
+//     .db("Mockdata")
+//     .collection("students")
+//     .deleteOne({_id:new ObjectId(id)});
+//   res.status(200).send(deleteStud);
 
-//delete from the database
-
-app.delete('/all/students/:id', async(req, res) => {
-  const { id } = req.params;
-  const deleteStud = await (
-    await client
-  )
-    .db("Mockdata")
-    .collection("students")
-    .deleteOne({_id:new ObjectId(id)});
-  res.status(200).send(deleteStud);
-
-})
-
-
+// })
 
 //================================================================
 

@@ -1,86 +1,81 @@
 import express from "express";
-import { client } from "./db.js"
-// import Obj from "mongodb";
-// var ObjectId = Obj.ObjectId;
-
+import { client } from "./db.js";
 import { ObjectId } from "../index.js";
+import {
+  deleteStudent,
+  getStudents,
+  getStudentsbyParams,
+  postStudent,
+  putStudent,
+} from "../Components/Students.js";
 
 const router = express.Router();
-
-// router.get("/", async (req, res) => {
-//   console.log(req.params);
-//   // console.log(id);
-//   const students =   await client .db("Mockdata")
-//     .collection("students")
-//     .find();
-//   console.log(students);
-//   res.status(200).json(students);
-// })
-
 router.get("/", async (req, res) => {
   console.log(req.query);
-  const studentsData = await client
-    .db("Mockdata")
-    .collection("students")
-    .find(req.query)
-    .toArray(); // to return all data from an array
-  res.status(200).json(studentsData);
+  try {
+    const studentsData = await getStudents(req);
+    if (studentsData.length <= 0)
+      return res.status(404).send({ data: "Content not found" });
+    res.status(200).json(studentsData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ data: "internal server error" });
+  }
 });
-
 //get by params from database
-
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  console.log(req.params);
-  console.log(id);
-  const students = await client
-
-    .db("Mockdata")
-    .collection("students")
-    .findOne({ _id: new ObjectId(id) });
-  console.log(students);
-  res.status(200).json(students);
+  try {
+    console.log(req.params);
+    console.log(id);
+    const students = await getStudentsbyParams(id);
+    if (!students) return res.status(400).send({ data: "user not found !" });
+    res.status(200).json(students);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ data: "internal server error" });
+  }
 });
-
 //post
-
 router.post("/", async (req, res) => {
   const newdata = req.body;
 
-  const addData = await client
-    .db("Mockdata")
-    .collection("students")
-    .insertMany(newdata);
+  try {
+    const addData = await postStudent(newdata);
 
-  res.status(201).json(addData);
+    res.status(200).json(addData)
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({data: "internal server error" });
+  }
 });
-
 //edit from database
-
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const updateStud = req.body;
-  console.log(req.params);
-  console.log(id);
-  const students = await client
-
-    .db("Mockdata")
-    .collection("students")
-    .updateMany({ _id: new ObjectId(id) }, { $set: updateStud });
-  console.log(students);
-  res.status(200).json(students);
+  try {
+    const updateStud = req.body;
+if(!updateStud)return res.status(400).json({data: "content not found "})
+    console.log(req.params);
+    console.log(id);
+    const students = await putStudent(id, updateStud);
+    // if(students=[])return res.status(400).json({data: "content not entered"})
+    res.status(200).json({data: "Edited Successfullly"});
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ data: "internal server error" });
+  }
 });
-
 //delete from the database
-
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  const deleteStud = await client
-
-    .db("Mockdata")
-    .collection("students")
-    .deleteOne({ _id: new ObjectId(id) });
-  res.status(200).send(deleteStud);
+  try {
+    const deleteStud = await deleteStudent(id);
+    if (!deleteStud) return res.status(400).send({ data: "user not found" });
+    res.status(200).send(deleteStud);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ data: "internal server error" });
+  }
 });
 
 export const StudData = router;

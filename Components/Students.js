@@ -26,7 +26,7 @@ export function postStudent(newdata){
   return  client
     .db("Mockdata")
     .collection("students")
-    .insertMany(newdata);
+    .insertOne(newdata);
 }
 
 export function putStudent(id,updateStud){

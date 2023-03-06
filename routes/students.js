@@ -38,9 +38,7 @@ router.get("/:id", async (req, res) => {
 });
 //post
 router.post("/", async (req, res) => {
-  const newdata = {name:req.body.name, batch: req.body.batch, age:req.body.age, qualification: req.body.qualification,
-  experience: req.body.experience
-  }
+  const newdata = req.body;
 
   try {
     const addData = await postStudent(newdata);

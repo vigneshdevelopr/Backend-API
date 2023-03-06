@@ -67,15 +67,9 @@ if(!updateStud)return res.status(400).json({data: "content not found "})
 });
 //delete from the database
 router.delete("/:id", async (req, res) => {
-  // const { id } = req.params;
+  const { id } = req.params;
   try {
-    // const deleteStud = await deleteStudent(id);
-    const deleteStud = await deleteStudent.findByIdandDelete(
-      {_id:req.params.id},
-      {$set:req.body},
-            {new:true}
-    )
-    
+    const deleteStud = await deleteStudent(id);
     if (!deleteStud) return res.status(400).send({ data: "user not found" });
     res.status(200).send(deleteStud);
   } catch (error) {
